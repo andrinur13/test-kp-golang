@@ -5,9 +5,9 @@ import (
 	"log"
 	"os"
 	"test-kp-golang/src/database"
-	"test-kp-golang/src/user/handler"
-	"test-kp-golang/src/user/repository"
-	usecase "test-kp-golang/src/user/use-case"
+	"test-kp-golang/src/domain/user/handler"
+	"test-kp-golang/src/domain/user/repository"
+	usecase "test-kp-golang/src/domain/user/use-case"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"

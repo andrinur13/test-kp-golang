@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"test-kp-golang/src/user/entity"
+	"test-kp-golang/src/domain/user/entity"
 
 	"gorm.io/gorm"
 )

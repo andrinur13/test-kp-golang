@@ -1,6 +1,6 @@
 package usecase
 
-import "test-kp-golang/src/user/entity"
+import "test-kp-golang/src/domain/user/entity"
 
 type UserRepository interface {
 	CreateUser(user entity.User) (entity.User, error)

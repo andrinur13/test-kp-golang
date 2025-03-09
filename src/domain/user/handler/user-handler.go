@@ -3,10 +3,10 @@ package handler
 import (
 	"net/http"
 	"strconv"
-	"test-kp-golang/src/user/entity"
-	"test-kp-golang/src/user/request"
-	"test-kp-golang/src/user/response"
-	usecase "test-kp-golang/src/user/use-case"
+	"test-kp-golang/src/domain/user/entity"
+	"test-kp-golang/src/domain/user/request"
+	"test-kp-golang/src/domain/user/response"
+	usecase "test-kp-golang/src/domain/user/use-case"
 	"test-kp-golang/src/utils"
 	"time"
 
