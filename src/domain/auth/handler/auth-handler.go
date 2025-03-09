@@ -81,6 +81,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	}
 
 	_, err = h.usecase.CreateUser(entity.User{
+		Nik:               register.Nik,
 		FullName:          register.FullName,
 		LegalName:         register.LegalName,
 		Email:             register.Email,

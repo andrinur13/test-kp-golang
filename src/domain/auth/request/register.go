@@ -1,6 +1,7 @@
 package request
 
 type RegisterUserRequest struct {
+	Nik               string `json:"nik"`
 	FullName          string `json:"full_name"`
 	LegalName         string `json:"legal_name"`
 	Email             string `json:"email"`
