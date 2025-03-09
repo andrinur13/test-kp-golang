@@ -3,31 +3,30 @@ package repository
 import (
 	"errors"
 	"test-kp-golang/src/user/entity"
+
+	"gorm.io/gorm"
 )
 
 type UserRepository struct {
-	users  map[int]entity.User
-	nextID int
+	db *gorm.DB
 }
 
-func NewUserRepository() *UserRepository {
+func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{
-		users:  make(map[int]entity.User),
-		nextID: 1,
+		db: db,
 	}
 }
 
 func (r *UserRepository) CreateUser(user entity.User) (entity.User, error) {
-	user.ID = r.nextID
-	r.users[user.ID] = user
-	r.nextID++
+	r.db.Create(&user)
 	return user, nil
 }
 
 func (r *UserRepository) GetUserByID(id int) (entity.User, error) {
-	user, exists := r.users[id]
-	if !exists {
-		return entity.User{}, errors.New("user not found")
+	var user entity.User
+	if err := r.db.First(&user, id).Error; err != nil {
+		return user, errors.New("user not found")
 	}
+
 	return user, nil
 }
