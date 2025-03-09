@@ -31,3 +31,14 @@ func (r *UserRepository) GetUserByID(id int) (entity.User, error) {
 
 	return user, nil
 }
+
+func (r *UserRepository) GetUserByEmail(email string) (entity.User, error) {
+	var user entity.User
+
+	result := r.db.Where("email = ?", email).First(&user)
+	if result.Error != nil {
+		return user, result.Error
+	}
+
+	return user, nil
+}
