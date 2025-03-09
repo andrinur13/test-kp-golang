@@ -5,7 +5,9 @@ import (
 	"strconv"
 	"test-kp-golang/src/user/entity"
 	"test-kp-golang/src/user/request"
+	"test-kp-golang/src/user/response"
 	usecase "test-kp-golang/src/user/use-case"
+	"test-kp-golang/src/utils"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -26,19 +28,19 @@ func NewUserHandler(r *gin.Engine, usecase *usecase.UserUsecase) {
 func (h *UserHandler) CreateUser(c *gin.Context) {
 	var user request.RegisterUserRequest
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.FormatErrorResponse(c, "error", http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
 	bornDate, err := time.Parse("2006-01-02", user.BornDate)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format"})
+		utils.FormatErrorResponse(c, "error", http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.MinCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		utils.FormatErrorResponse(c, "error", http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
@@ -55,25 +57,39 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	})
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		utils.FormatErrorResponse(c, "error", http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	c.JSON(http.StatusCreated, createdUser)
+	utils.FormatResponse(c, "success", http.StatusCreated, "User created successfully", response.UserRegistered{
+		ID:       createdUser.ID,
+		FullName: createdUser.FullName,
+	})
 }
 
 func (h *UserHandler) GetUserByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		utils.FormatErrorResponse(c, "error", http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
 	user, err := h.usecase.GetUserByID(id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		utils.FormatErrorResponse(c, "error", http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	utils.FormatResponse(c, "success", http.StatusOK, "User detail", response.UserDetail{
+		ID:                user.ID,
+		FullName:          user.FullName,
+		LegalName:         user.LegalName,
+		Email:             user.Email,
+		BornCity:          user.BornCity,
+		BornDate:          user.BornDate.Format("2006-01-02"),
+		Income:            user.Income,
+		IdentityPhotoPath: user.IdentityPhotoPath,
+		SelfiePhotoPath:   user.SelfiePhotoPath,
+		CreatedAt:         user.CreatedAt.Format("2006-01-02 15:04:05"),
+	})
 }

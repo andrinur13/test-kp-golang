@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"test-kp-golang/src/user/entity"
 
 	"gorm.io/gorm"
@@ -24,8 +23,10 @@ func (r *UserRepository) CreateUser(user entity.User) (entity.User, error) {
 
 func (r *UserRepository) GetUserByID(id int) (entity.User, error) {
 	var user entity.User
-	if err := r.db.First(&user, id).Error; err != nil {
-		return user, errors.New("user not found")
+
+	result := r.db.Where("id = ?", id).First(&user)
+	if result.Error != nil {
+		return user, result.Error
 	}
 
 	return user, nil
