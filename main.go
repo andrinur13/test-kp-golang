@@ -5,7 +5,8 @@ import (
 	"log"
 	"os"
 	"test-kp-golang/src/database"
-	"test-kp-golang/src/domain/user/handler"
+	authHandler "test-kp-golang/src/domain/auth/handler"
+	userHandler "test-kp-golang/src/domain/user/handler"
 	"test-kp-golang/src/domain/user/repository"
 	usecase "test-kp-golang/src/domain/user/use-case"
 
@@ -57,7 +58,8 @@ func main() {
 	userUsecase := usecase.NewUserUsecase(userRepo)
 
 	r := gin.Default()
-	handler.NewUserHandler(r, userUsecase)
+	userHandler.NewUserHandler(r, userUsecase)
+	authHandler.NewAuthHandler(r, userUsecase)
 
 	r.Run(":8080")
 }
