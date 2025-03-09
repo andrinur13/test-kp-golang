@@ -8,19 +8,19 @@ type UserRepository interface {
 }
 
 type UserUsecase struct {
-	UserRepository UserRepository
+	userRepo UserRepository
 }
 
-func NewUserUsecase(userRepository UserRepository) *UserUsecase {
+func NewUserUsecase(userRepo UserRepository) *UserUsecase {
 	return &UserUsecase{
-		UserRepository: userRepository,
+		userRepo: userRepo,
 	}
 }
 
 func (u *UserUsecase) CreateUser(user entity.User) (entity.User, error) {
-	return u.UserRepository.CreateUser(user)
+	return u.userRepo.CreateUser(user)
 }
 
 func (u *UserUsecase) GetUserByID(id int) (entity.User, error) {
-	return u.UserRepository.GetUserByID(id)
+	return u.userRepo.GetUserByID(id)
 }

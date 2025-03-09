@@ -4,9 +4,12 @@ import (
 	"net/http"
 	"strconv"
 	"test-kp-golang/src/user/entity"
+	"test-kp-golang/src/user/request"
 	usecase "test-kp-golang/src/user/use-case"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserHandler struct {
@@ -21,13 +24,36 @@ func NewUserHandler(r *gin.Engine, usecase *usecase.UserUsecase) {
 }
 
 func (h *UserHandler) CreateUser(c *gin.Context) {
-	var user entity.User
+	var user request.RegisterUserRequest
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	createdUser, err := h.usecase.CreateUser(user)
+	bornDate, err := time.Parse("2006-01-02", user.BornDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format"})
+		return
+	}
+
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.MinCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	createdUser, err := h.usecase.CreateUser(entity.User{
+		FullName:          user.FullName,
+		LegalName:         user.LegalName,
+		Email:             user.Email,
+		Password:          string(hashPassword),
+		BornCity:          user.BornCity,
+		BornDate:          bornDate,
+		Income:            user.Income,
+		SelfiePhotoPath:   user.SelfiePhotoPath,
+		IdentityPhotoPath: user.IdentityPhotoPath,
+	})
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
