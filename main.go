@@ -6,6 +6,9 @@ import (
 	"os"
 	"test-kp-golang/src/database"
 	authHandler "test-kp-golang/src/domain/auth/handler"
+	productHandler "test-kp-golang/src/domain/product/handler"
+	ProductRepository "test-kp-golang/src/domain/product/repository"
+	productUseCase "test-kp-golang/src/domain/product/use-case"
 	userHandler "test-kp-golang/src/domain/user/handler"
 	"test-kp-golang/src/domain/user/repository"
 	usecase "test-kp-golang/src/domain/user/use-case"
@@ -55,11 +58,15 @@ func main() {
 	}
 
 	userRepo := repository.NewUserRepository(db)
+	productRepo := ProductRepository.NewProductRepository(db)
+
 	userUsecase := usecase.NewUserUsecase(userRepo)
+	productUsecase := productUseCase.NewProductUsecase(*productRepo)
 
 	r := gin.Default()
 	userHandler.NewUserHandler(r, userUsecase)
 	authHandler.NewAuthHandler(r, userUsecase)
+	productHandler.NewProductHandler(r, productUsecase)
 
 	r.Run(":8080")
 }
