@@ -1,44 +1,64 @@
 package handler
 
 import (
-	"test-kp-golang/src/domain/transaction/response"
+	"net/http"
+	"strconv"
+	"test-kp-golang/src/domain/transaction/request"
 	usecase "test-kp-golang/src/domain/transaction/use-case"
+	"test-kp-golang/src/domain/user/entity"
+	"test-kp-golang/src/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
 type TransactionHandler struct {
 	useCase *usecase.TransactionUseCase
 }
 
-func NewTransactionHandler(useCase *usecase.TransactionUseCase) *TransactionHandler {
-	return &TransactionHandler{
-		useCase: useCase,
-	}
+func NewTransactionHandler(r *gin.Engine, useCase *usecase.TransactionUseCase) {
+	handler := &TransactionHandler{useCase: useCase}
+
+	r.GET("/transactions", handler.FindByUserId)
+	r.GET("/transactions/:id", handler.FindByUserId)
+	r.POST("/transactions", handler.CreateTransaction)
 }
 
-func (h *TransactionHandler) FindByUserId(id int) ([]response.TransactionResponse, error) {
-	transactions, err := h.useCase.FindByUserId(id)
+func (h *TransactionHandler) FindByUserId(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(entity.User)
+	transactions, err := h.useCase.FindByUserId(currentUser.ID)
 	if err != nil {
-		return []response.TransactionResponse{}, err
+		utils.FormatErrorResponse(c, "error", http.StatusBadRequest, err.Error(), nil)
+		return
 	}
 
-	return transactions, nil
+	utils.FormatErrorResponse(c, "success", http.StatusOK, "success", transactions)
 }
 
-// func (h *TransactionHandler) Create(transactionRequest request.TransactionRequest) (response.TransactionResponse, error) {
+func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(entity.User)
 
-// 	transaction, err := h.useCase.Create(transactionRequest)
-// 	if err != nil {
-// 		return response.TransactionResponse{}, err
-// 	}
+	var transaction request.TransactionRequest
+	if err := c.ShouldBindJSON(&transaction); err != nil {
+		utils.FormatErrorResponse(c, "error", http.StatusBadRequest, err.Error(), nil)
+		return
+	}
 
-// 	return transaction, nil
-// }
+	transactionResponse, err := h.useCase.Create(currentUser.ID, transaction)
+	if err != nil {
+		utils.FormatErrorResponse(c, "error", http.StatusBadRequest, err.Error(), nil)
+		return
+	}
 
-func (h *TransactionHandler) FindById(id int) (response.TransactionResponse, error) {
+	utils.FormatErrorResponse(c, "success", http.StatusOK, "success", transactionResponse)
+}
+
+func (h *TransactionHandler) FindById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
 	transaction, err := h.useCase.FindById(id)
 	if err != nil {
-		return response.TransactionResponse{}, err
+		utils.FormatErrorResponse(c, "error", http.StatusBadRequest, err.Error(), nil)
+		return
 	}
 
-	return transaction, nil
+	utils.FormatErrorResponse(c, "success", http.StatusOK, "success", transaction)
 }

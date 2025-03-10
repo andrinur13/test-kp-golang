@@ -46,3 +46,25 @@ func (r *TransactionRepository) FindById(id int) (entity.Transaction, error) {
 
 	return transaction, nil
 }
+
+func (r *TransactionRepository) FindPaidStatusTransactionByUserId(userId int) ([]entity.Transaction, error) {
+	var transactions []entity.Transaction
+
+	result := r.db.Where("user_id = ? AND status = ?", userId, "PAID").Find(&transactions)
+	if result.Error != nil {
+		return transactions, result.Error
+	}
+
+	return transactions, nil
+}
+
+func (r *TransactionRepository) FindUnpaidStatusTransactionByUserId(userId int) ([]entity.Transaction, error) {
+	var transactions []entity.Transaction
+
+	result := r.db.Where("user_id = ? AND status = ?", userId, "UNPAID").Find(&transactions)
+	if result.Error != nil {
+		return transactions, result.Error
+	}
+
+	return transactions, nil
+}
