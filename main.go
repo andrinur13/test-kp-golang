@@ -9,6 +9,9 @@ import (
 	productHandler "test-kp-golang/src/domain/product/handler"
 	ProductRepository "test-kp-golang/src/domain/product/repository"
 	productUseCase "test-kp-golang/src/domain/product/use-case"
+	transactionHandler "test-kp-golang/src/domain/transaction/handler"
+	transactionRepository "test-kp-golang/src/domain/transaction/repository"
+	transactionUseCase "test-kp-golang/src/domain/transaction/use-case"
 	userHandler "test-kp-golang/src/domain/user/handler"
 	"test-kp-golang/src/domain/user/repository"
 	usecase "test-kp-golang/src/domain/user/use-case"
@@ -59,14 +62,17 @@ func main() {
 
 	userRepo := repository.NewUserRepository(db)
 	productRepo := ProductRepository.NewProductRepository(db)
+	transactionRepo := transactionRepository.NewTransactionRepository(db)
 
 	userUsecase := usecase.NewUserUsecase(userRepo)
 	productUsecase := productUseCase.NewProductUsecase(*productRepo)
+	transactionUseCase := transactionUseCase.NewTransactionUseCase(*transactionRepo)
 
 	r := gin.Default()
 	userHandler.NewUserHandler(r, userUsecase)
 	authHandler.NewAuthHandler(r, userUsecase)
 	productHandler.NewProductHandler(r, productUsecase)
+	transactionHandler.NewTransactionHandler(r, transactionUseCase)
 
 	r.Run(":8080")
 }
